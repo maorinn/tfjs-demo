@@ -17,6 +17,7 @@ export class Webcam {
           },
         })
         .then((stream) => {
+          // @ts-ignore
           window.localStream = stream;
           videoRef.current.srcObject = stream;
           videoRef.current.onloadedmetadata = () => {
@@ -33,6 +34,7 @@ export class Webcam {
   close = (videoRef:any) => {
     if (videoRef.current.srcObject) {
       videoRef.current.srcObject = null;
+      // @ts-ignore
       window.localStream.getTracks().forEach((track) => {
         track.stop();
       });

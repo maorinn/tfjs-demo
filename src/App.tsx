@@ -7,12 +7,18 @@ import { renderBoxes } from "./utils/renderBox";
 import { Webcam } from "./utils/webcam";
 function App() {
   const videoRef: any = useRef();
-  const canvasRef: any = useRef(null);
-  const threshold = 0.25;
+  const canvasRef: any = useRef();
+  const threshold = 0.7;
   const webcam = new Webcam();
   const loadModel = async () => {
-    const model = await loadGraphModel(
-      "https://raw.githubusercontent.com/Hyuto/yolov5-tfjs/master/public/yolov5n_web_model/model.json"
+    // const model = await loadGraphModel(
+    //   "https://raw.githubusercontent.com/Hyuto/yolov5-tfjs/master/public/yolov5n_web_model/model.json"
+    // );
+    // const model = await loadGraphModel(
+    //   "./models/yolov5s_web_model/model.json"
+    // );
+      const model = await loadGraphModel(
+      "./models/belly_web_model/model.json"
     );
     return model;
   };

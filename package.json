@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "upload": "npm run build && orbit uploadDev dist insulinAI"
   },
   "dependencies": {
     "@tensorflow/tfjs": "3.15.0",
