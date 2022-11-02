@@ -7,13 +7,13 @@ export class Webcam {
    * @param {React.MutableRefObject} videoRef video tag reference
    * @param {function} onLoaded callback function to be called when webcam is open
    */
-  open = (videoRef:any, onLoaded:any) => {
+  open = (videoRef:any, onLoaded:any,facingMode:string) => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({
           audio: false,
           video: {
-            facingMode: "environment",
+            facingMode: facingMode,
           },
         })
         .then((stream) => {

@@ -1,4 +1,4 @@
-import labels from "./labels_yolov5s.json";
+import labels from "./labels.json";
 
 /**
  * Render prediction boxes
