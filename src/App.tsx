@@ -7,6 +7,7 @@ import { renderBoxes } from "./utils/renderBox";
 import { Webcam } from "./utils/webcam";
 import * as handdetection from "@tensorflow-models/hand-pose-detection";
 import * as handPoseDetection from "@tensorflow-models/hand-pose-detection";
+import * as mpHands from '@mediapipe/hands';
 let detector: {
   estimateHands: (arg0: any, arg1: { flipHorizontal: boolean }) => any;
   dispose: () => void;
@@ -19,7 +20,7 @@ function App() {
   const videoRef: any = useRef();
   const canvasRef: any = useRef();
   const [facingMode, setFacingMode] = useState("environment");
-  const threshold = 0.3;
+  const threshold = 0.35;
   let model = null;
 
   let webcam: any;
@@ -106,7 +107,7 @@ function App() {
       runtime: "mediapipe",
       modelType: "lite",
       maxHands: 2,
-      solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/hands",
+      solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${mpHands.VERSION}`,
     });
   };
   const renderResult = async () => {

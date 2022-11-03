@@ -9,4 +9,10 @@ export default defineConfig({
     port: 5173,
   },
   base: "./",
+  build: {
+    commonjsOptions: { include: [] },
+  },
+  optimizeDeps: {
+    disabled: false,
+  },
 });
