@@ -17,7 +17,6 @@ export const renderBoxes = (
   currentHandPoit?: { x: number; y: number }
 ) => {
   const ctx = canvasRef.current.getContext("2d");
-  // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
   const _labels = labels as any;
   // font configs
   const font = "18px sans-serif";
@@ -74,4 +73,5 @@ export const renderBoxes = (
       ctx.fillText(klass + " - " + score + "%", x1 - 1, y1 - (textHeight + 2));
     }
   }
+
 };
