@@ -7,7 +7,7 @@ import { renderBoxes } from "./utils/renderBox";
 import { Webcam } from "./utils/webcam";
 import * as handdetection from "@tensorflow-models/hand-pose-detection";
 import * as handPoseDetection from "@tensorflow-models/hand-pose-detection";
-import * as mpHands from '@mediapipe/hands';
+import * as mpHands from "@mediapipe/hands";
 let detector: {
   estimateHands: (arg0: any, arg1: { flipHorizontal: boolean }) => any;
   dispose: () => void;
@@ -15,13 +15,14 @@ let detector: {
 let rafId;
 // 是否开始加载模型
 let isModelReady = false;
+let yoloModel: any = null;
+
 // TODO fix: 目标检测和手部检测 的预测结果会出现 两个 canvas 重叠的情况
 function App() {
   const videoRef: any = useRef();
   const canvasRef: any = useRef();
   const [facingMode, setFacingMode] = useState("environment");
   const threshold = 0.35;
-  let model = null;
 
   let webcam: any;
   const loadModel = async () => {
@@ -55,35 +56,6 @@ function App() {
     } else {
       return null;
     }
-  };
-  const detectFrame = async (model: any) => {
-    tf.engine().startScope();
-    // 获取输入tensor
-    const input = process_input(model);
-    // 切换视频流，input可能会为空
-    if (input) {
-      // 执行模型推理
-      await model.executeAsync(input).then((predictions: any) => {
-        const [boxes, scores, classes] = predictions.slice(0, 3);
-        const boxes_data = boxes.dataSync();
-        const scores_data = scores.dataSync();
-        const classes_data = classes.dataSync();
-        // 渲染检测结果
-        renderBoxes(
-          canvasRef,
-          threshold,
-          boxes_data,
-          scores_data,
-          classes_data
-        );
-        tf.dispose(predictions);
-      });
-    }
-    requestAnimationFrame(() => {
-      input && input.dispose(); // 清除输入tensor
-      detectFrame(model);
-    });
-    tf.engine().endScope();
   };
   const switchCamera = () => {
     webcam.close(videoRef);
@@ -134,17 +106,46 @@ function App() {
         alert(error);
       }
     }
+    // 预测腹部关键点
+    tf.engine().startScope();
+    // 获取输入tensor
+    const input = process_input(yoloModel);
+    // 切换视频流，input可能会为空
+    let predictions;
+    if (input) {
+      // 执行模型推理
+      predictions = await yoloModel.executeAsync(input);
+    }
+    webcam.drawCtx();
+
     // The null check makes sure the UI is not in the middle of changing to a
     // different model. If during model change, the result is from an old model,
     // which shouldn't be rendered.
     if (hands && hands.length > 0) {
       webcam.drawResults(hands);
     }
+    // 渲染 腹部结果
+    try {
+      const [boxes, scores, classes] = predictions.slice(0, 3);
+      const boxes_data = boxes.dataSync();
+      const scores_data = scores.dataSync();
+      const classes_data = classes.dataSync();
+      // 渲染检测结果
+      renderBoxes(canvasRef, threshold, boxes_data, scores_data, classes_data);
+      tf.dispose(predictions);
+      input && input.dispose();
+    } catch (err) {
+      console.log(err);
+    }
+    tf.engine().endScope();
   };
+  /**
+   * 预测渲染
+   */
   const renderPrediction = async () => {
     if (!detector && !isModelReady) {
-      isModelReady = true
-      detector = await createDetector()
+      isModelReady = true;
+      detector = await createDetector();
     }
     await renderResult();
     rafId = requestAnimationFrame(renderPrediction);
@@ -153,6 +154,7 @@ function App() {
   useEffect(() => {
     webcam = new Webcam(videoRef.current, canvasRef.current);
     loadModel().then(async (_model) => {
+      yoloModel = _model;
       // 预热
       const dummyInput = tf.ones(_model.inputs[0].shape as any);
       // @ts-ignore
@@ -161,20 +163,20 @@ function App() {
         tf.dispose(warmupResult);
         tf.dispose(dummyInput);
         // 打开摄像头，之后开始检测
-        webcam.open(videoRef, () => detectFrame(_model), facingMode);
+        webcam.open(videoRef, () => renderPrediction(), facingMode);
       });
     });
-    // // 加载手部检测模型
-    renderPrediction();
   }, []);
   return (
     <div className="App">
       <h2>胰岛素场景医疗AI识别demo YOLOv5 & Tensorflow.js</h2>
       <p>Currently running model : YOLOv5</p>
       <div className="content">
-        <video id="video" autoPlay playsInline muted ref={videoRef} />
-        <canvas id="canvas" width={640} height={480} ref={canvasRef} />
-        <button onClick={switchCamera}>切换摄像头</button>
+        <div className="canvas-wrapper">
+          <video id="video" className="video" playsInline ref={videoRef} />
+          <canvas id="canvas" className="canvas" ref={canvasRef} />
+          <button onClick={switchCamera}>切换摄像头</button>
+        </div>
       </div>
     </div>
   );

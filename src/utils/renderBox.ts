@@ -10,7 +10,7 @@ import labels from "./labels.json";
  */
 export const renderBoxes = (canvasRef:any, threshold:any, boxes_data:any, scores_data:any, classes_data:string[]) => {
   const ctx = canvasRef.current.getContext("2d");
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
+  // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
   const _labels = labels as any
   // font configs
   const font = "18px sans-serif";

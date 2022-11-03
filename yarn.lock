@@ -318,6 +318,22 @@
     "@types/seedrandom" "^2.4.28"
     seedrandom "^3.0.5"
 
+"@tensorflow/tfjs-backend-cpu@3.9.0":
+  version "3.9.0"
+  resolved "https://registry.npmmirror.com/@tensorflow/tfjs-backend-cpu/-/tfjs-backend-cpu-3.9.0.tgz#27ee581a4765039eb0e84d9d473b6d5f2769c813"
+  integrity sha512-PUv5B3wdQsA8cysk+oUhA0NqMoo/lwP8EazC/axQc8/72Dc6kU8uw/5qZtE5P4xXSqkNSlh2ifFm+8nH/6B+iA==
+  dependencies:
+    "@types/seedrandom" "2.4.27"
+    seedrandom "2.4.3"
+
+"@tensorflow/tfjs-backend-wasm@3.9.0":
+  version "3.9.0"
+  resolved "https://registry.npmmirror.com/@tensorflow/tfjs-backend-wasm/-/tfjs-backend-wasm-3.9.0.tgz#7b6972cce5f626fc389d5679e7ce18cbe774ac28"
+  integrity sha512-UuEkB4t3pSMe8dHYJ2GzPGnoeqmOJZ1UFCjeR1j7xEyUi7Px5G/qeW0B8xaQ88dxPqw0Cd8YSq/2e9P7oWSoCQ==
+  dependencies:
+    "@tensorflow/tfjs-backend-cpu" "3.9.0"
+    "@types/emscripten" "~0.0.34"
+
 "@tensorflow/tfjs-backend-webgl@3.15.0":
   version "3.15.0"
   resolved "https://registry.npmmirror.com/@tensorflow/tfjs-backend-webgl/-/tfjs-backend-webgl-3.15.0.tgz#5a1a302700003955aa3e10aabbdee08c28729cf6"
@@ -408,6 +424,11 @@
     core-js "3"
     regenerator-runtime "^0.13.5"
     yargs "^16.0.3"
+
+"@types/emscripten@~0.0.34":
+  version "0.0.34"
+  resolved "https://registry.npmmirror.com/@types/emscripten/-/emscripten-0.0.34.tgz#12b4a344274fb102ff2f6c877b37587bc3e46008"
+  integrity sha512-QSb9ojDincskc+uKMI0KXp8e1NALFINCrMlp8VGKGcTSxeEyRTTKyjWw75NYrCZHUsVEEEpr1tYHpbtaC++/sQ==
 
 "@types/long@^4.0.1":
   version "4.0.2"

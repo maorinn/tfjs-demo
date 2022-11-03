@@ -1,5 +1,16 @@
 import * as params from "./params";
+export function isiOS() {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
 
+export function isAndroid() {
+  return /Android/i.test(navigator.userAgent);
+}
+
+export function isMobile() {
+  return isAndroid() || isiOS();
+}
+const $size = params.VIDEO_SIZE["640 X 480"];
 /**
  * Class to handle webcam
  */
@@ -8,8 +19,8 @@ export class Webcam {
   video: any;
   ctx: any;
   constructor(video: any, canvas: any) {
-    this.video =  document.getElementById('video');;
-    this.canvas =  document.getElementById('canvas');
+    this.video = document.getElementById("video");
+    this.canvas = document.getElementById("canvas");
     this.ctx = this.canvas.getContext("2d");
   }
   /**
@@ -24,6 +35,12 @@ export class Webcam {
           audio: false,
           video: {
             facingMode: facingMode,
+            width: isMobile()
+              ? params.VIDEO_SIZE["360 X 270"].width
+              : $size.width,
+            height: isMobile()
+              ? params.VIDEO_SIZE["360 X 270"].height
+              : $size.height,
           },
         })
         .then((stream) => {
@@ -31,8 +48,26 @@ export class Webcam {
           window.localStream = stream;
           videoRef.current.srcObject = stream;
           videoRef.current.onloadedmetadata = () => {
+            this.video.play();
+            const videoWidth = this.video.videoWidth;
+            const videoHeight = this.video.videoHeight;
+            this.video.width = videoWidth;
+            this.video.height = videoHeight;
+  
+            this.canvas.width = videoWidth;
+            this.canvas.height = videoHeight;
+            const canvasContainer = document.querySelector('.canvas-wrapper');
+            // @ts-ignore
+            canvasContainer.style = `width: ${videoWidth}px; height: ${videoHeight}px`;
+  
+            // 翻转视频
+            // this.ctx.translate(this.video.videoWidth, 0);
+            // this.ctx.scale(-1, 1);
             onLoaded();
+           
           };
+      
+     
         });
     } else alert("Can't open Webcam!");
   };
@@ -52,7 +87,12 @@ export class Webcam {
   };
   drawCtx() {
     this.ctx.drawImage(
-        this.video, 0, 0, this.video.videoWidth, this.video.videoHeight);
+      this.video,
+      0,
+      0,
+      this.video.videoWidth,
+      this.video.videoHeight
+    );
   }
   /**
    * 绘制手部关键点识别结果
@@ -104,7 +144,7 @@ export class Webcam {
     for (let i = 0; i < keypointsArray.length; i++) {
       const y = keypointsArray[i].x;
       const x = keypointsArray[i].y;
-      this.drawPoint(x -2, y - 2, 3);
+      this.drawPoint(x - 2, y - 2, 3);
     }
 
     const fingers = Object.keys(params.fingerLookupIndices);
@@ -112,7 +152,7 @@ export class Webcam {
       const finger = fingers[i];
       // @ts-ignore
       const points = params.fingerLookupIndices[finger].map(
-        (idx:any) => keypoints[idx]
+        (idx: any) => keypoints[idx]
       );
       this.drawPath(points, false);
     }
