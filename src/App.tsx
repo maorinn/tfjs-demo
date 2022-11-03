@@ -135,11 +135,11 @@ function App() {
     if (hands && hands.length > 0) {
       webcam.drawResults(hands);
       // TODO:暂时用拇指坐标判断是否进入了关键区域
-      let { keypoints, handedness } = hands[0];
-      currentHandPoit = {
-        x: keypoints[1].x,
-        y: keypoints[1].y,
-      };
+        let { keypoints, handedness } = hands[0];
+        currentHandPoit = {
+          x: keypoints[12].x,
+          y: keypoints[12].y,
+        };
     }
     // 渲染 腹部结果
     try {
