@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*9
 lerna-debug.log*
-
+yolov5m_web_model.1
 node_modules
 dist
 dist-ssr
