@@ -8,6 +8,7 @@ import { Webcam } from "./utils/webcam";
 import * as handdetection from "@tensorflow-models/hand-pose-detection";
 import * as handPoseDetection from "@tensorflow-models/hand-pose-detection";
 import * as mpHands from "@mediapipe/hands";
+import * as Stats from "stats.js";
 let detector: {
   estimateHands: (arg0: any, arg1: { flipHorizontal: boolean }) => any;
   dispose: () => void;
@@ -16,15 +17,17 @@ let rafId;
 // 是否开始加载模型
 let isModelReady = false;
 let yoloModel: any = null;
-
+var stats = new Stats();
+stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+let webcam: any;
+const threshold = 0.35;
+tf.setBackend('webgl')
+document.body.appendChild(stats.dom);
 // TODO fix: 目标检测和手部检测 的预测结果会出现 两个 canvas 重叠的情况
 function App() {
   const videoRef: any = useRef();
   const canvasRef: any = useRef();
   const [facingMode, setFacingMode] = useState("environment");
-  const threshold = 0.35;
-
-  let webcam: any;
   const loadModel = async () => {
     // const model = await loadGraphModel(
     //   "https://raw.githubusercontent.com/Hyuto/yolov5-tfjs/master/public/yolov5n_web_model/model.json"
@@ -143,11 +146,13 @@ function App() {
    * 预测渲染
    */
   const renderPrediction = async () => {
+    stats.begin();
     if (!detector && !isModelReady) {
       isModelReady = true;
       detector = await createDetector();
     }
     await renderResult();
+    stats.end();
     rafId = requestAnimationFrame(renderPrediction);
   };
 

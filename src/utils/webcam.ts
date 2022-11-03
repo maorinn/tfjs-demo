@@ -18,6 +18,7 @@ export class Webcam {
   canvas: any;
   video: any;
   ctx: any;
+
   constructor(video: any, canvas: any) {
     this.video = document.getElementById("video");
     this.canvas = document.getElementById("canvas");
@@ -29,6 +30,7 @@ export class Webcam {
    * @param {function} onLoaded callback function to be called when webcam is open
    */
   open = (videoRef: any, onLoaded: any, facingMode: string) => {
+    const { targetFPS, sizeOption } = params.STATE.camera;
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({
@@ -41,6 +43,9 @@ export class Webcam {
             height: isMobile()
               ? params.VIDEO_SIZE["360 X 270"].height
               : $size.height,
+            frameRate: {
+              ideal: targetFPS,
+            },
           },
         })
         .then((stream) => {
@@ -53,21 +58,18 @@ export class Webcam {
             const videoHeight = this.video.videoHeight;
             this.video.width = videoWidth;
             this.video.height = videoHeight;
-  
+
             this.canvas.width = videoWidth;
             this.canvas.height = videoHeight;
-            const canvasContainer = document.querySelector('.canvas-wrapper');
+            const canvasContainer = document.querySelector(".canvas-wrapper");
             // @ts-ignore
             canvasContainer.style = `width: ${videoWidth}px; height: ${videoHeight}px`;
-  
+
             // 翻转视频
             // this.ctx.translate(this.video.videoWidth, 0);
             // this.ctx.scale(-1, 1);
             onLoaded();
-           
           };
-      
-     
         });
     } else alert("Can't open Webcam!");
   };
