@@ -9,6 +9,7 @@ import * as handdetection from "@tensorflow-models/hand-pose-detection";
 import * as handPoseDetection from "@tensorflow-models/hand-pose-detection";
 import * as mpHands from "@mediapipe/hands";
 import * as Stats from "stats.js";
+import "@tensorflow/tfjs-backend-webgl";
 let detector: {
   estimateHands: (arg0: any, arg1: { flipHorizontal: boolean }) => any;
   dispose: () => void;
@@ -21,7 +22,12 @@ var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 let webcam: any;
 const threshold = 0.35;
-tf.setBackend('webgl')
+// 当前手位置
+let currentHandPoit = {
+  x: -1,
+  y: -1,
+};
+tf.setBackend("webgl");
 document.body.appendChild(stats.dom);
 // TODO fix: 目标检测和手部检测 的预测结果会出现 两个 canvas 重叠的情况
 function App() {
@@ -36,6 +42,8 @@ function App() {
     //   "./models/yolov5s_web_model/model.json"
     // );
     const model = await loadGraphModel("./models/yolov5n_web_model/model.json");
+    // const model = await loadGraphModel("./models/belly_web_model/model.json");
+
     return model;
   };
   const process_input = (model: any) => {
@@ -126,6 +134,12 @@ function App() {
     // which shouldn't be rendered.
     if (hands && hands.length > 0) {
       webcam.drawResults(hands);
+      // TODO:暂时用拇指坐标判断是否进入了关键区域
+      let { keypoints, handedness } = hands[0];
+      currentHandPoit = {
+        x: keypoints[1].x,
+        y: keypoints[1].y,
+      };
     }
     // 渲染 腹部结果
     try {
@@ -134,12 +148,24 @@ function App() {
       const scores_data = scores.dataSync();
       const classes_data = classes.dataSync();
       // 渲染检测结果
-      renderBoxes(canvasRef, threshold, boxes_data, scores_data, classes_data);
+      renderBoxes(
+        canvasRef,
+        threshold,
+        boxes_data,
+        scores_data,
+        classes_data,
+        currentHandPoit
+      );
       tf.dispose(predictions);
       input && input.dispose();
+      currentHandPoit = {
+        x:-1,
+        y:-1
+      }
     } catch (err) {
       console.log(err);
     }
+    // 判断
     tf.engine().endScope();
   };
   /**
@@ -178,7 +204,7 @@ function App() {
       <p>Currently running model : YOLOv5</p>
       <div className="content">
         <div className="canvas-wrapper">
-          <video id="video" className="video" playsInline ref={videoRef} />
+          <video id="video" className="video" playsInline muted ref={videoRef} />
           <canvas id="canvas" className="canvas" ref={canvasRef} />
           <button onClick={switchCamera}>切换摄像头</button>
         </div>
