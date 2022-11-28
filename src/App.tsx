@@ -41,7 +41,7 @@ function App() {
     // const model = await loadGraphModel(
     //   "./models/yolov5s_web_model/model.json"
     // );
-    const model = await loadGraphModel("./models/yolov5n_web_model/model.json");
+    const model = await loadGraphModel("./models/yolov5n/model.json");
     // const model = await loadGraphModel("./models/belly_web_model/model.json");
 
     return model;
